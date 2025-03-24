@@ -1,17 +1,19 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"faizisyellow.com/todolist/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
 
-var ADDRESS = "localhost:8000"
+var ADDRESS = "localhost:4000"
 
 type application struct {
 	infoLog  *log.Logger
@@ -40,16 +42,30 @@ func main() {
 		w.Write([]byte("welcome to todo-list web app."))
 	}))
 
-	app := application{
-		infoLog:  infoLog,
-		errorLog: errorLog,
-		users: &mysql.UserModel{
-			DB: db,
-		},
+	// app := application{
+	// 	infoLog:  infoLog,
+	// 	errorLog: errorLog,
+	// 	users: &mysql.UserModel{
+	// 		DB: db,
+	// 	},
+	// }
+
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
+	srv := &http.Server{
+		Addr:         ADDRESS,
+		ErrorLog:     errorLog,
+		Handler:      mux,
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	infoLog.Printf("Starting server on %s", ADDRESS)
-	err = http.ListenAndServe(ADDRESS, mux)
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
 
