@@ -37,18 +37,13 @@ func main() {
 
 	db.Close()
 
-	mux := http.NewServeMux()
-	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome to todo-list web app."))
-	}))
-
-	// app := application{
-	// 	infoLog:  infoLog,
-	// 	errorLog: errorLog,
-	// 	users: &mysql.UserModel{
-	// 		DB: db,
-	// 	},
-	// }
+	app := application{
+		infoLog:  infoLog,
+		errorLog: errorLog,
+		users: &mysql.UserModel{
+			DB: db,
+		},
+	}
 
 	tlsConfig := &tls.Config{
 		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
@@ -57,7 +52,7 @@ func main() {
 	srv := &http.Server{
 		Addr:         ADDRESS,
 		ErrorLog:     errorLog,
-		Handler:      mux,
+		Handler:      app.routes(),
 		TLSConfig:    tlsConfig,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
