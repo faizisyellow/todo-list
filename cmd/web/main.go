@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"database/sql"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -16,9 +17,10 @@ import (
 var ADDRESS = "localhost:4000"
 
 type application struct {
-	infoLog  *log.Logger
-	errorLog *log.Logger
-	users    *mysql.UserModel
+	infoLog       *log.Logger
+	errorLog      *log.Logger
+	users         *mysql.UserModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
