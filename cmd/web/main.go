@@ -39,12 +39,18 @@ func main() {
 
 	db.Close()
 
+	templateCache, err := newTemplateCache("./ui/html")
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	app := application{
 		infoLog:  infoLog,
 		errorLog: errorLog,
 		users: &mysql.UserModel{
 			DB: db,
 		},
+		templateCache: templateCache,
 	}
 
 	tlsConfig := &tls.Config{
