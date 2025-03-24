@@ -6,11 +6,18 @@ import (
 	"net/http"
 	"os"
 
+	"faizisyellow.com/todolist/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
 
 var ADDRESS = "localhost:8000"
+
+type application struct {
+	infoLog  *log.Logger
+	errorLog *log.Logger
+	users    *mysql.UserModel
+}
 
 func main() {
 	infoLog := log.New(os.Stdout, "\033[32mINFO\t\033[0m", log.Ldate|log.Ltime)
@@ -32,6 +39,14 @@ func main() {
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome to todo-list web app."))
 	}))
+
+	app := application{
+		infoLog:  infoLog,
+		errorLog: errorLog,
+		users: &mysql.UserModel{
+			DB: db,
+		},
+	}
 
 	infoLog.Printf("Starting server on %s", ADDRESS)
 	err = http.ListenAndServe(ADDRESS, mux)
