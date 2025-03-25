@@ -31,6 +31,7 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 	}
 
 	td.CSRFToken = nosurf.Token(r)
+	td.AuthenticatedUser = app.authenticatedUser(r)
 	return td
 }
 

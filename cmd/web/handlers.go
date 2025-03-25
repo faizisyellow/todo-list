@@ -7,12 +7,8 @@ import (
 	"faizisyellow.com/todolist/pkg/models"
 )
 
-func (app *application) ping(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("OK"))
-}
-
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Home OK"))
+	app.render(w, r, "home.page.tmpl", nil)
 }
 
 func (app *application) signupForm(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +27,7 @@ func (app *application) signup(w http.ResponseWriter, r *http.Request) {
 	form := forms.New(r.PostForm)
 	form.Required("name", "email", "password")
 	form.MatchesPattern("email", forms.EmailRX)
-	form.MinLength("password", 3)
+	form.MinLength("password", 10)
 
 	if !form.Valid() {
 		app.render(w, r, "signup.page.tmpl", &templateData{
@@ -91,4 +87,8 @@ func (app *application) logout(w http.ResponseWriter, r *http.Request) {
 	app.session.Remove(r, "userID")
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func (app *application) ping(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK"))
 }

@@ -6,11 +6,13 @@ import (
 	"time"
 
 	"faizisyellow.com/todolist/pkg/forms"
+	"faizisyellow.com/todolist/pkg/models"
 )
 
 type templateData struct {
-	Form      *forms.Form
-	CSRFToken string
+	Form              *forms.Form
+	CSRFToken         string
+	AuthenticatedUser *models.Users
 }
 
 func humanDate(t *time.Time) string {
