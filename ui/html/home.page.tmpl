@@ -24,10 +24,14 @@
           </div>
           <div class="flex items-center space-x-4">
             <form action="/logout" method="POST">
-              <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+              <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
               {{ if .AuthenticatedUser}}
-              <button class="text-gray-700 hover:text-blue-dark px-3 py-2 rounded-md text-sm font-medium">Logout  ({{ .AuthenticatedUser.Name }})</button>
-              {{end}}
+              <button
+                class="text-gray-700 hover:text-blue-dark px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Logout ({{ .AuthenticatedUser.Name }})
+              </button>
+              {{ end }}
             </form>
           </div>
         </div>
@@ -35,9 +39,7 @@
     </nav>
 
     <!-- App Header -->
-    <header
-      class="app-header py-8 relative"
-    >
+    <header class="app-header py-8 relative">
       <div class="absolute inset-0 bg-blue-500 bg-opacity-50"></div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <h1 class="text-white text-center text-4xl font-bold tracking-wider">
@@ -74,18 +76,30 @@
         <h2 class="text-xl font-semibold mb-4 text-gray-800">
           Create Your Todo-List
         </h2>
-        <div class="flex space-x-3 w-full">
-          <input
-            type="text"
-            class="flex-1 bg-gray-100 rounded-md py-3 px-5 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-accent focus:border-transparent"
-            placeholder="Enter your task..."
-          />
+        <form
+          class="flex space-x-3 w-full"
+          action="/todos"
+          method="POST"
+          novalidate
+        >
+          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+          {{ with.Form }}
+          <input type="text" class="flex-1 bg-gray-100 rounded-md py-3 px-5
+          border border-gray-200 focus:outline-none focus:ring-2
+          focus:ring-blue-accent focus:border-transparent" placeholder="Enter
+          your task..." value="{{ .Get "task" }}" required name="task" />
           <button
+            type="submit"
             class="bg-blue-accent text-white hover:bg-blue-dark transition-colors duration-300 rounded-md py-3 px-6 shadow-sm"
           >
             <i class="fas fa-plus mr-2"></i> Add Task
           </button>
-        </div>
+        </form>
+        {{ end }}
+
+        {{ with.Form.Errors.Get "task" }}
+        <div class="text-red-600 text-sm mt-2">{{.}}</div>
+        {{ end }}
       </div>
 
       <!-- Tasks List with Status and Created Task columns - Made columns wider -->

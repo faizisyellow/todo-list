@@ -8,7 +8,43 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	app.render(w, r, "home.page.tmpl", nil)
+	app.render(w, r, "home.page.tmpl", &templateData{
+		Form: forms.New(nil),
+	})
+}
+
+func (app *application) newTodo(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	user := app.authenticatedUser(r)
+
+	form := forms.New(r.PostForm)
+	form.Required("task")
+	form.MinLength("task", 3)
+
+	if !form.Valid() {
+		app.render(w, r, "home.page.tmpl", &templateData{
+			Form: form,
+		})
+		return
+	}
+
+	err = app.todos.Insert(form.Get("task"), user.ID)
+	if err == models.ErrRequireUser {
+		form.Errors.Add("task", "Invalid input")
+		app.render(w, r, "home.page.tmpl", &templateData{
+			Form: form,
+		})
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) signupForm(w http.ResponseWriter, r *http.Request) {

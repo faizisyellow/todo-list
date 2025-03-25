@@ -15,6 +15,7 @@ func (app *application) routes() http.Handler {
 	router := mux.NewRouter()
 
 	router.Handle("/", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.home)).Methods("GET")
+	router.Handle("/todos", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.newTodo)).Methods("POST")
 
 	router.Handle("/signup", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.signupForm)).Methods("GET")
 	router.Handle("/signup", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.signup)).Methods("POST")
