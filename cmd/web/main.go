@@ -15,7 +15,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var ADDRESS = "localhost:8000"
+// custom type for key context
+type contextKey string
+
+var (
+	ADDRESS        = "localhost:8000"
+	contextKeyUser = contextKey("user")
+)
 
 type application struct {
 	infoLog       *log.Logger

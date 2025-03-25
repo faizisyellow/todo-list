@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"faizisyellow.com/todolist/pkg/models"
 	"github.com/justinas/nosurf"
 )
 
@@ -50,7 +51,13 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 
 // check whether a
 // request is being made by an authenticated user or not by checking for the
-// existence of a "userID" value in their session data.
-func (app *application) authenticatedUser(r *http.Request) int {
-	return app.session.GetInt(r, "userID")
+// existence of a "userID" value in their context request data.
+func (app *application) authenticatedUser(r *http.Request) *models.Users {
+	user, ok := r.Context().Value(contextKeyUser).(*models.Users)
+	if !ok {
+		return nil
+	}
+
+	return user
+
 }
