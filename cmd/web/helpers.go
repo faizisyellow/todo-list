@@ -44,3 +44,10 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 
 	buf.WriteTo(w)
 }
+
+// check whether a
+// request is being made by an authenticated user or not by checking for the
+// existence of a "userID" value in their session data.
+func (app *application) authenticatedUser(r *http.Request) int {
+	return app.session.GetInt(r, "userID")
+}

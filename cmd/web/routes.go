@@ -4,18 +4,27 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/justinas/alice"
 )
 
 func (app *application) routes() http.Handler {
+
+	standardMiddleware := alice.New(app.logRequest, app.secureHeaders, app.recoverPanic)
+	dynamicMiddleware := alice.New(app.session.Enable)
+
 	router := mux.NewRouter()
-	router.HandleFunc("/", app.home).Methods("GET")
-	router.HandleFunc("/signup", app.signupForm).Methods("GET")
-	router.HandleFunc("/signup", app.signup).Methods("POST")
-	router.HandleFunc("/login", app.loginForm).Methods("GET")
-	router.HandleFunc("/login", app.login).Methods("POST")
+
+	router.Handle("/", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.home)).Methods("GET")
+
+	router.Handle("/signup", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.signupForm)).Methods("GET")
+	router.Handle("/signup", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.signup)).Methods("POST")
+	router.Handle("/login", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.loginForm)).Methods("GET")
+	router.Handle("/login", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.login)).Methods("POST")
+
+	router.Handle("/logout", dynamicMiddleware.ThenFunc(app.logout)).Methods("POST")
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./ui/static/"))))
 
 	router.HandleFunc("/ping", app.ping)
-	return router
+	return standardMiddleware.Then(router)
 }

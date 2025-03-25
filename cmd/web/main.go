@@ -11,16 +11,18 @@ import (
 
 	"faizisyellow.com/todolist/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golangcollege/sessions"
 	"github.com/joho/godotenv"
 )
 
-var ADDRESS = "localhost:4000"
+var ADDRESS = "localhost:8000"
 
 type application struct {
 	infoLog       *log.Logger
 	errorLog      *log.Logger
 	users         *mysql.UserModel
 	templateCache map[string]*template.Template
+	session       *sessions.Session
 }
 
 func main() {
@@ -44,6 +46,9 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	session := sessions.New([]byte(os.Getenv("Secret_Session_Key")))
+	session.Lifetime = 12 * time.Hour
+
 	app := application{
 		infoLog:  infoLog,
 		errorLog: errorLog,
@@ -51,6 +56,7 @@ func main() {
 			DB: db,
 		},
 		templateCache: templateCache,
+		session:       session,
 	}
 
 	tlsConfig := &tls.Config{
