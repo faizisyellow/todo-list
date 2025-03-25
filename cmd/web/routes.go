@@ -21,7 +21,7 @@ func (app *application) routes() http.Handler {
 	router.Handle("/login", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.loginForm)).Methods("GET")
 	router.Handle("/login", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.login)).Methods("POST")
 
-	router.Handle("/logout", dynamicMiddleware.ThenFunc(app.logout)).Methods("POST")
+	router.Handle("/logout", dynamicMiddleware.Append(noSurf, app.requireAuthenticatedUser).ThenFunc(app.logout)).Methods("POST")
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./ui/static/"))))
 

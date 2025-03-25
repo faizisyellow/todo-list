@@ -9,7 +9,8 @@ import (
 )
 
 type templateData struct {
-	Form *forms.Form
+	Form      *forms.Form
+	CSRFToken string
 }
 
 func humanDate(t *time.Time) string {
