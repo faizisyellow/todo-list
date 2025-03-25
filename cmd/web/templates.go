@@ -4,9 +4,12 @@ import (
 	"html/template"
 	"path/filepath"
 	"time"
+
+	"faizisyellow.com/todolist/pkg/forms"
 )
 
 type templateData struct {
+	Form *forms.Form
 }
 
 func humanDate(t *time.Time) string {
