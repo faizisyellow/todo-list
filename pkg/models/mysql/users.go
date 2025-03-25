@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"database/sql"
-	"fmt"
 	"strings"
 
 	"faizisyellow.com/todolist/pkg/models"
@@ -27,8 +26,7 @@ func (m *UserModel) Insert(email, name, password string) error {
 	_, err = m.DB.Exec(stmt, email, name, string(hashedPassword))
 	if err != nil {
 		if mysqlError, ok := err.(*mysql.MySQLError); ok {
-			if mysqlError.Number == 1062 && strings.Contains(mysqlError.Message, "users_uc_email") {
-				fmt.Printf("ERROR DUPLICATE EMAIL; %v", mysqlError.Message)
+			if mysqlError.Number == 1062 && strings.Contains(mysqlError.Message, "users.email_UNIQUE") {
 				return models.ErrDuplicateEmail
 			}
 		}
