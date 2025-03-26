@@ -22,9 +22,9 @@
     </a>
 
     <!-- Todo Detail Card -->
-     {{ with .Todo}}
     <div class="bg-white shadow-xl rounded-lg overflow-hidden">
       <div class="p-6">
+        {{ with.Todo }}
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold text-gray-800">{{ .Task}}</h2>
           <span
@@ -39,13 +39,12 @@
             <label class="block text-sm font-medium text-gray-600 mb-1"
               >Created At</label
             >
-            <p class="text-gray-900">{{ humanDate .CreatedAt}}</p>
+            <p class="text-gray-900">{{ humanDate .CreatedAt }}</p>
           </div>
-
         </div>
-
         <div class="flex gap-x-4">
-          <form action="/todo/complete" method="POST" class="mb-4">
+          <form action="/todos/complete/{{ .ID}}" method="POST" class="mb-4">
+            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}" />
             <button
               type="submit"
               class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
@@ -54,7 +53,8 @@
             </button>
           </form>
 
-          <form action="/todo/delete" method="POST">
+          <form action="/todos/delete/{{ .ID}}" method="POST">
+              <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}" />
             <button
               type="submit"
               class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
@@ -63,10 +63,9 @@
             </button>
           </form>
         </div>
-
-      </div>
+      {{ end }}
     </div>
-    {{end}}
+    </div>
   </div>
 </div>
 {{ end }}

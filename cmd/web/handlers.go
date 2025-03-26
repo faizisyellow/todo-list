@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -43,7 +44,7 @@ func (app *application) newTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.todos.Insert(form.Get("task"), user.ID)
+	id, err := app.todos.Insert(form.Get("task"), user.ID)
 	if err == models.ErrRequireUser {
 		form.Errors.Add("task", "Invalid input")
 		app.render(w, r, "home.page.tmpl", &templateData{
@@ -55,8 +56,9 @@ func (app *application) newTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/todos/%v", id), http.StatusSeeOther)
 }
+
 func (app *application) detailTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -77,6 +79,57 @@ func (app *application) detailTodo(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "detail_todo.page.tmpl", &templateData{
 		Todo: todo,
 	})
+}
+
+func (app *application) completeTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		app.notFound(w)
+		return
+	}
+
+	err = app.todos.Update("status", "complete", id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) pendingTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		app.notFound(w)
+		return
+	}
+
+	err = app.todos.Update("status", "pending", id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) deleteTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		app.notFound(w)
+		return
+	}
+
+	err = app.todos.Delete(id)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) signupForm(w http.ResponseWriter, r *http.Request) {

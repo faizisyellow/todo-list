@@ -92,24 +92,36 @@
           {{ humanDate .CreatedAt }}
         </div>
         <div class="col-span-2 flex justify-end space-x-3">
-          <button
+
+          <form action="/todos/complete/{{.ID}}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}" />
+            <button
             class="text-green-600 hover:text-green-800 transition-colors"
             title="Mark as complete"
-          >
+            >
             <i class="fas fa-check-circle"></i>
           </button>
+        </form>
+
+        <form action="/todos/pending/{{.ID}}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}" />
           <button
-            class="text-yellow-600 hover:text-yellow-800 transition-colors"
-            title="Mark as pending"
+          class="text-yellow-600 hover:text-yellow-800 transition-colors"
+          title="Mark as pending"
           >
-            <i class="fas fa-clock"></i>
+          <i class="fas fa-clock"></i>
           </button>
-          <button
+        </form>
+        
+        <form action="/todos/delete/{{.ID}}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{$.CSRFToken}}" />
+            <button
             class="text-red-600 hover:text-red-800 transition-colors"
             title="Delete task"
-          >
+            >
             <i class="fas fa-trash-alt"></i>
-          </button>
+            </button>
+        </form>
         </div>
       </div>
       {{ end }}

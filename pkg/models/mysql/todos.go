@@ -13,19 +13,24 @@ type TodosModel struct {
 	DB *sql.DB
 }
 
-func (t *TodosModel) Insert(task string, userID int) error {
+func (t *TodosModel) Insert(task string, userID int) (int, error) {
 	stmt := `INSERT INTO todos (task, user_id, created_at) VALUES(?, ?, NOW())`
 
-	_, err := t.DB.Exec(stmt, task, userID)
+	result, err := t.DB.Exec(stmt, task, userID)
 	if err != nil {
 		if mysqlError, ok := err.(*mysql.MySQLError); ok {
 			if mysqlError.Number == 1452 && strings.Contains(mysqlError.Message, "a foreign key constraint fails") {
-				return models.ErrRequireUser
+				return 0, models.ErrRequireUser
 			}
 		}
 	}
 
-	return err
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), err
 }
 
 func (t *TodosModel) Latest(userID int) ([]*models.Todos, error) {
@@ -80,6 +85,16 @@ func (t *TodosModel) Update(col string, val string, id int) error {
 	stmt := fmt.Sprintf("UPDATE todos SET %s = ? WHERE id = ?", col)
 
 	_, err := t.DB.Exec(stmt, val, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *TodosModel) Delete(id int) error {
+
+	_, err := t.DB.Exec("DELETE FROM todos WHERE id  = ?", id)
 	if err != nil {
 		return err
 	}
