@@ -13,6 +13,8 @@ type templateData struct {
 	Form              *forms.Form
 	CSRFToken         string
 	AuthenticatedUser *models.Users
+	Todos             []*models.Todos
+	Todo              *models.Todos
 }
 
 func humanDate(t *time.Time) string {
@@ -20,7 +22,7 @@ func humanDate(t *time.Time) string {
 		return ""
 	}
 
-	return t.UTC().Format("2 Jan 2006 at 15:04")
+	return t.UTC().Format("2 Jan 2006")
 }
 
 var functions = template.FuncMap{

@@ -2,14 +2,25 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"faizisyellow.com/todolist/pkg/forms"
 	"faizisyellow.com/todolist/pkg/models"
+	"github.com/gorilla/mux"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
+	user := app.authenticatedUser(r)
+
+	todos, err := app.todos.Latest(user.ID)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
 	app.render(w, r, "home.page.tmpl", &templateData{
-		Form: forms.New(nil),
+		Form:  forms.New(nil),
+		Todos: todos,
 	})
 }
 
@@ -45,6 +56,27 @@ func (app *application) newTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+func (app *application) detailTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		app.notFound(w)
+		return
+	}
+
+	todo, err := app.todos.Get(id)
+	if err == models.ErrNoRecords {
+		app.notFound(w)
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.render(w, r, "detail_todo.page.tmpl", &templateData{
+		Todo: todo,
+	})
 }
 
 func (app *application) signupForm(w http.ResponseWriter, r *http.Request) {

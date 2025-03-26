@@ -1,0 +1,54 @@
+{{define "base"}}
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App - {{ template "title" .}}</title>
+    <link rel="stylesheet" href="./../static/css/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../static/js/tailwind.config.js"></script>
+  </head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <nav class="bg-white border-b border-gray-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex">
+              <div class="flex-shrink-0 flex items-center">
+                <a href="/" class="text-blue-dark font-semibold text-lg">Home</a>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <form action="/logout" method="POST">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" />
+                {{ if .AuthenticatedUser}}
+                <button
+                  class="text-gray-700 hover:text-blue-dark px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Logout ({{ .AuthenticatedUser.Name }})
+                </button>
+                {{ end }}
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <header class="app-header py-8 relative">
+        <div class="absolute inset-0 bg-blue-500 bg-opacity-50"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <h1 class="text-white text-center text-4xl font-bold tracking-wider">
+            TODO APP
+          </h1>
+        </div>
+      </header>
+
+      {{template "body" .}}
+
+      {{template "footer" .}}
+</body>
+</html>
+{{end}}

@@ -1,0 +1,72 @@
+{{ template "base" .}}
+
+{{ define "title"}} Detail Task {{ end }}
+
+{{ define "body"}}
+<div class="flex-grow container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto">
+    <a href="/" class="text-blue-600 hover:text-blue-800 mb-6 inline-block">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 inline-block mr-2"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Back to task list
+    </a>
+
+    <!-- Todo Detail Card -->
+     {{ with .Todo}}
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold text-gray-800">{{ .Task}}</h2>
+          <span
+            class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800"
+          >
+            {{ .Status}}
+          </span>
+        </div>
+
+        <div class="space-y-4 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1"
+              >Created At</label
+            >
+            <p class="text-gray-900">{{ humanDate .CreatedAt}}</p>
+          </div>
+
+        </div>
+
+        <div class="flex gap-x-4">
+          <form action="/todo/complete" method="POST" class="mb-4">
+            <button
+              type="submit"
+              class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Confirm Complete
+            </button>
+          </form>
+
+          <form action="/todo/delete" method="POST">
+            <button
+              type="submit"
+              class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Delete Task
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+    {{end}}
+  </div>
+</div>
+{{ end }}
