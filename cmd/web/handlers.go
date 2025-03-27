@@ -81,49 +81,22 @@ func (app *application) detailTodo(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (app *application) completeTodo(w http.ResponseWriter, r *http.Request) {
+func (app *application) actionsTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	actions := vars["actions"]
+
 	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
+	if err != nil || actions != "pending" && actions != "complete" && actions != "delete" {
 		app.notFound(w)
 		return
 	}
 
-	err = app.todos.Update("status", "complete", id)
-	if err != nil {
-		app.serverError(w, err)
-		return
+	if actions == "delete" {
+		err = app.todos.Delete(id)
+	} else {
+		err = app.todos.Update("status", actions, id)
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func (app *application) pendingTodo(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.notFound(w)
-		return
-	}
-
-	err = app.todos.Update("status", "pending", id)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func (app *application) deleteTodo(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.notFound(w)
-		return
-	}
-
-	err = app.todos.Delete(id)
 	if err != nil {
 		app.serverError(w, err)
 		return

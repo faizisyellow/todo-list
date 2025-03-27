@@ -17,9 +17,7 @@ func (app *application) routes() http.Handler {
 	router.Handle("/", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.home)).Methods("GET")
 	router.Handle("/todos", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.newTodo)).Methods("POST")
 	router.Handle("/todos/{id}", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.detailTodo)).Methods("GET")
-	router.Handle("/todos/complete/{id}", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.completeTodo)).Methods("POST")
-	router.Handle("/todos/pending/{id}", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.pendingTodo)).Methods("POST")
-	router.Handle("/todos/delete/{id}", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.deleteTodo)).Methods("POST")
+	router.Handle("/todos/{actions}/{id}", dynamicMiddleware.Append(app.requireAuthenticatedUser).ThenFunc(app.actionsTodo)).Methods("POST")
 
 	router.Handle("/signup", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.signupForm)).Methods("GET")
 	router.Handle("/signup", dynamicMiddleware.Append(app.userAlreadyAuthenticated).ThenFunc(app.signup)).Methods("POST")
